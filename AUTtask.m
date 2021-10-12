@@ -20,6 +20,9 @@ end
 
 if design.runEEG
     design.sp           = BioSemiSerialPort();
+    pauseOff=254;
+    pauseOn=255;
+    design.sp.sendTrigger(pauseOff)
 end
 
 %Import the options of the excel file
@@ -34,7 +37,7 @@ if design.Session == 1
 elseif design.Session == 2
     sessionorder=order(4:6);
 elseif design.Session == 3
-    sessionorder=order(7:9);   
+    sessionorder=order(7:9);
 end
 
 mic_image=imread('mic_image.png');
@@ -70,7 +73,7 @@ design.allRects(:, 1) = CenterRectOnPointd(baseRect, design.xCenter, design.yCen
 numchannels = 1; % mono sound
 % you can CHOOSE your frequency when recording
 design.freq = 44100;
-   
+
 % we also open an audio channel when we're doing recording
 audiochannel = PsychPortAudio('Open', [], 2, [], design.freq, numchannels);
 % except we set it to 2 instead of 1
@@ -87,7 +90,7 @@ PsychPortAudio('GetAudioData', audiochannel, 10);
 Screen('TextSize', design.window, 30);
 AUTInstructions(design);
 
-Trialtype='Practice'; 
+Trialtype='Practice';
 Index = find(contains(ConditionList.TrialType,Trialtype));
 Results={}; counter=1;
 for t=1:length(Index)
@@ -107,7 +110,7 @@ Screen('Flip',design.window); KbStrokeWait;
 
 Trialtype='Test'; Results={}; counter=1;
 for t=1:length(sessionorder)
-
+    
     Category=ConditionList.Category{sessionorder(t)};
     design.fontsize=70;
     [Results,counter]=AUTTrialstructure(design,counter,Results,audiochannel,mic_image,t,Category,Trialtype);
@@ -131,6 +134,10 @@ DrawFormattedText(design.window, sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s
     'Great! You finished the game!', ...
     'Thank you for your participation!'), 'center', 'center',design.grey,[100],[],[],[2]);
 Screen('Flip',design.window); KbStrokeWait;
+
+if design.runEEG
+    design.sp.sendTrigger(pauseOn)
+end
 
 % Clear the screen
 sca;
