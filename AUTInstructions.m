@@ -1,4 +1,4 @@
-function []=PASTAInstructions(design)
+function []=AUTInstructions(design)
 
 fontcolor=design.grey;
 

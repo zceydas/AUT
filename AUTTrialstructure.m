@@ -4,7 +4,8 @@ function [Results,counter]=AUTTrialstructure(design,counter,Results,audiochannel
 fixationstart=100;
 fixationend=101;
 ideacode=102;
-lagtime=0.035;
+speakcode=103;
+lagtime=0.012;
 %%%%%%%%%%%%%%%%
 
 Screen('TextSize', design.window, design.fontsize);
@@ -35,13 +36,13 @@ DrawFormattedText(design.window, Category, 'center',...
 if contains(Trialtype,'Practice')
     Screen('TextSize', design.window, 35);
     Screen('TextFont', design.window, 'Times');
-    DrawFormattedText(design.window, '(Once you are done reading, press the space bar)', 'center',...
+    DrawFormattedText(design.window, '(Read the word in 3 seconds.)', 'center',...
         design.screenYpixels * 0.90, design.grey);
 end
 
 % Flip to the screen
 Screen('Flip', design.window); ReadStart=GetSecs; WaitSecs(0.2);
-KbStrokeWait; Readit=GetSecs; ReadTime=Readit-ReadStart;
+WaitSecs(3); Readit=GetSecs; ReadTime=Readit-ReadStart;
 RecordTime=0; Recordall=0;
 triggered=0;
 
@@ -89,7 +90,9 @@ while 1
     end
     
     if triggered
-        
+        if design.runEEG
+            design.sp.sendTrigger(speakcode)
+        end
         if ideacount == 0
             RT=GetSecs-Readit; % idea generation RT since the beginning of the first idea generation screen
         else
