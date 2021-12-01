@@ -11,6 +11,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 design.trialdeadline=180; % in seconds (for idea generation)
 design.subjectId=input('What is subject ID?');
 design.Session=input('What is study session? PreTest(1), Test1(2), Test2(3): '); % this can be 1 or 2 (test and re-test)
+design.PharmList=input('What is pharmacy list? A or B: ', 's');  % the list type Pharmacy gave
 design.runEEG=input('Are you recording EEG? Yes(1), No(0): '); % this can be 1 or 2 (test and re-test)
 
 datafileName = ['AUT_ID_' num2str(design.subjectId) '_SessionNo' num2str(design.Session) '_Data Folder'];
@@ -31,13 +32,22 @@ ConditionList=readtable('AUTtrials.xlsx',opts, 'ReadVariableNames', true);
 
 rng('default')
 rng(design.subjectId)
-order=shuffle([1:9]); % on each session 15 of them will be presented
+order=[1:9]; % on each session 3 of them will be presented
+
 if design.Session == 1
-    sessionorder=order(1:3);
+    sessionorder=order(1:3); % everyone gets the same list on pre-drug
 elseif design.Session == 2
-    sessionorder=order(4:6);
+    if design.PharmList == 'A'
+        sessionorder=order(4:6);
+    elseif design.PharmList == 'B'
+        sessionorder=order(7:9);
+    end
 elseif design.Session == 3
-    sessionorder=order(7:9);
+    if design.PharmList == 'B'
+        sessionorder=order(4:6);
+    elseif design.PharmList == 'A'
+        sessionorder=order(7:9);
+    end
 end
 
 mic_image=imread('mic_image.png');
